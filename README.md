@@ -14,6 +14,8 @@ Got access to the private UCSF git https://git.ucsf.edu/academic-research-system
 It contains `Eunomia_DB_demo.ipynb` and `eunomia.sqlite`.
 The notebook was out-of-date and didn't work.
 
+I've created an example `dbenv`, but I use my own hidden and not included `.dbenv`.
+
 I updated the notebook and it is now functioning for me.
 
 Nothing in the database or notebook is private so I've included them here.
