@@ -59,3 +59,9 @@ Now that its working, try gpt-4 and newer models
 
 
 
+It is sounding like the future is moving towards the chat models, 
+so this code will likely need to be heavily modified.
+Different model and different sql agent creation I guess.
+
+
+
