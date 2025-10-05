@@ -1,0 +1,7 @@
+
+# Not free from https://platform.openai.com/
+# OPENAI_API_KEY=GET_YOUR_OWN_OPENAI_API_KEY
+
+# Free from https://smith.langchain.com/
+LANGCHAIN_API_KEY=GET_YOUR_OWN_LANGCHAIN_API_KEY
+
