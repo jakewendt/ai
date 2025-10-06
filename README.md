@@ -4,6 +4,23 @@ Documenting my AI learning ...
 
 
 
+##	20251006
+
+New ChatGPT's version works pretty good. 
+
+It tried to add some "streaming chat" stuff, but it never worked and then I hit the limit for the day.
+
+
+##	20251005
+
+Extracted the running code and first question into a simple python script.
+
+Then I asked chatgpt to update it to use newer "chat completion" style models.
+
+It did as well as recommend the removal of the LangChain stuff.
+
+I'll create a new notebook tomorrow to include this.
+
 
 ##	20251004
 
@@ -57,11 +74,8 @@ https://community.openai.com/t/gpt-4-vs-3-5-turbo-instruct/447223
 
 Now that its working, try gpt-4 and newer models
 
-
-
 It is sounding like the future is moving towards the chat models, 
 so this code will likely need to be heavily modified.
 Different model and different sql agent creation I guess.
-
 
 
