@@ -5,3 +5,6 @@
 # Free from https://smith.langchain.com/
 LANGCHAIN_API_KEY=GET_YOUR_OWN_LANGCHAIN_API_KEY
 
+#API_KEY=
+#API_VERSION=2024-10-21
+#RESOURCE_ENDPOINT=https://unified-api.ucsf.edu/general
