@@ -15,22 +15,20 @@ import pandas as pd
 
 
 # ---------- Setup ----------
-#_ = load_dotenv(".dbenv")
 _ = load_dotenv()
 
 # This dbenv only needs an OPENAI_API_KEY
 # No LANGCHAIN_API_KEY is needed as langchain has been removed
 
+from openai import OpenAI
 #client = OpenAI()
 
-#from openai import OpenAI
-
 from openai import AzureOpenAI
-client = AzureOpenAI(
-	api_key=os.environ.get('API_KEY'),
-	api_version=os.environ.get('API_VERSION'),
-	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
-)
+#client = AzureOpenAI(
+#	api_key=os.environ.get('API_KEY'),
+#	api_version=os.environ.get('API_VERSION'),
+#	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
+#)
 
 DB_PATH = "eunomia.sqlite"
 conn = sqlite3.connect(DB_PATH)
@@ -182,11 +180,28 @@ Return SQL inside code fences
 # https://posit-dev.github.io/chatlas/reference/ChatOpenAI.html
 #load_dotenv()
 chat_client = ChatOpenAI(
+#client = AzureOpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
+		#api_key=os.environ.get('API_KEY'),
+		#api_version=os.environ.get('API_VERSION'),
+		#azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
+		#)
+		#
+		##ChatCompletion
+		##response = openai.ChatCompletion.create(
+		#chat_client = client.chat.completions.create(
     model="gpt-4o",
+		#model = 'gpt-4o-mini-2024-07-18',
     #model="gpt-4o-mini",	#	try this next time as it may be cheaper. The output sql isn't printed pretty for some reason
     system_prompt="You are a helpful assistant.",
+    #messages=[{"role": "system", "content": "You are a helpful assistant."}],
 )
+#messages=[
+#	# The system content below shapes the behavior of the model. For instance, you could instruct the model to only answer in French.
+#	{"role": "system", "content": 'You are a helpful AI assistant'}, 
+#	{"role": "user", "content": 'This is a test'}  # The content contains your prompt
+#]
+
 
 
 # Set some Shiny page options
