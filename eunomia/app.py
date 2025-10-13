@@ -1,7 +1,9 @@
 # ------------------------------------------------------------------------------------
 # A basic Shiny Chat example powered by OpenAI.
 # ------------------------------------------------------------------------------------
+
 import os
+#from pprint import pformat
 
 from app_utils import load_dotenv
 from chatlas import ChatOpenAI
@@ -9,7 +11,8 @@ from chatlas import ChatOpenAI
 from shiny.express import ui
 
 import sqlite3
-from openai import OpenAI
+import pandas as pd
+
 
 # ---------- Setup ----------
 #_ = load_dotenv(".dbenv")
@@ -18,7 +21,17 @@ _ = load_dotenv()
 # This dbenv only needs an OPENAI_API_KEY
 # No LANGCHAIN_API_KEY is needed as langchain has been removed
 
-client = OpenAI()
+#client = OpenAI()
+
+#from openai import OpenAI
+
+from openai import AzureOpenAI
+client = AzureOpenAI(
+	api_key=os.environ.get('API_KEY'),
+	api_version=os.environ.get('API_VERSION'),
+	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
+)
+
 DB_PATH = "eunomia.sqlite"
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -58,10 +71,12 @@ Database schema:
 Write a valid SQLite SQL query that answers:
 {question}
 
-Return only SQL, no explanations or code fences.
+Return SQL inside code fences
 """
+		#Return only SQL, no explanations or code fences.
     sql = chat(prompt, role="SQL expert")
-    return clean_sql(sql)
+    return sql
+    #return clean_sql(sql)
 
 
 #	def explain_results(question: str, sql: str, rows: list) -> str:
@@ -169,6 +184,7 @@ Return only SQL, no explanations or code fences.
 chat_client = ChatOpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
     model="gpt-4o",
+    #model="gpt-4o-mini",	#	try this next time as it may be cheaper. The output sql isn't printed pretty for some reason
     system_prompt="You are a helpful assistant.",
 )
 
@@ -214,12 +230,19 @@ Return only SQL, no explanations or code fences.
 	async for text_chunk in response:
 		full_response += text_chunk
 
+	#	The SQL is "pretty" because it SOMETIMES includes ```sql
+	print(full_response)
+	full_response=clean_sql(full_response)
+	await chat.append_message_stream("```sql\n"+full_response+"\n```")
 
-	await chat.append_message_stream(full_response)
-
-	cursor.execute(clean_sql(full_response))
+	cursor.execute(full_response)
 	rows = cursor.fetchall()
-	await chat.append_message_stream(str(rows))
+
+	#await chat.append_message_stream(pformat(rows))
+	#await chat.append_message_stream("```"+str(rows)+"```")
+	#await chat.append_message_stream(str(rows.to_markdown(index=False)))
+	#await chat.append_message_stream(str(pd.DataFrame(rows).to_markdown(index=False)))
+	await chat.append_message_stream(str(pd.DataFrame(rows).to_markdown()))
 
 
 
@@ -238,7 +261,7 @@ Return only SQL, no explanations or code fences.
 #	→ Visit https://shiny.posit.co/py/docs/genai-chatbots.html
 
 
-#	shiny run --reload --launch-browser app_dir/app.py
+#	shiny run --reload --launch-browser ./app.py
 
 #	pip install rsconnect-python
 #
@@ -250,4 +273,6 @@ Return only SQL, no explanations or code fences.
 #	Not sure what purpose "-n eunomia" serves but apparently something is required
 #		-n, --name TEXT                 The nickname of the Posit Connect server to deploy to.
 #	rsconnect deploy shiny -n eunomia .
+
+
 
