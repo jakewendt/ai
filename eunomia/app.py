@@ -47,6 +47,7 @@ _ = load_dotenv()
 
 
 #	The "new" way using Responses instead of ChatCompletions
+#	https://platform.openai.com/docs/api-reference/responses
 from openai import OpenAI
 client = OpenAI()
 
