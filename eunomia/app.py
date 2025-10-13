@@ -247,6 +247,8 @@ Write a valid SQLite SQL query that correctly answers:
 
 {user_input}
 
+Always limit your query to at most 25 results.
+
 Return only SQL, no explanations or code fences.
 """
 
