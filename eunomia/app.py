@@ -25,7 +25,7 @@ _ = load_dotenv()
 # https://posit-dev.github.io/chatlas/reference/ChatOpenAI.html
 from chatlas import ChatOpenAI
 chat_client = ChatOpenAI(
-	api_key=os.environ.get("OPENAI_API_KEY"),
+	#api_key=os.environ.get("OPENAI_API_KEY"),
 	model="gpt-4o",
 	#model="gpt-4o-mini",	#	just not as good
 	#system_prompt="You are a helpful assistant.",
