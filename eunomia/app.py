@@ -23,14 +23,14 @@ _ = load_dotenv()
 # ChatOpenAI() requires an API key from OpenAI.
 # See the docs for more information on how to obtain one.
 # https://posit-dev.github.io/chatlas/reference/ChatOpenAI.html
-from chatlas import ChatOpenAI
-chat_client = ChatOpenAI(
-	#api_key=os.environ.get("OPENAI_API_KEY"),
-	model="gpt-4o",
-	#model="gpt-4o-mini",	#	just not as good
-	#system_prompt="You are a helpful assistant.",
-	system_prompt="You are an expert sqlite3 programmer.",
-)
+#from chatlas import ChatOpenAI
+#chat_client = ChatOpenAI(
+#	#api_key=os.environ.get("OPENAI_API_KEY"),
+#	model="gpt-4o",
+#	#model="gpt-4o-mini",	#	just not as good
+#	#system_prompt="You are a helpful assistant.",
+#	system_prompt="You are an expert sqlite3 programmer.",
+#)
 
 
 ##from openai import OpenAI
@@ -44,6 +44,11 @@ chat_client = ChatOpenAI(
 #	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
 #)
 
+
+
+#	The "new" way using Responses instead of ChatCompletions
+from openai import OpenAI
+client = OpenAI()
 
 
 DB_PATH = "eunomia.sqlite"
@@ -254,10 +259,10 @@ Return only SQL, no explanations or code fences.
 
 
 	#	OpenAI
-	response = await chat_client.stream_async( prompt )
-	full_response=""
-	async for text_chunk in response:
-		full_response += text_chunk
+	#response = await chat_client.stream_async( prompt )
+	#full_response=""
+	#async for text_chunk in response:
+	#	full_response += text_chunk
 	
 	#	Versa API
 	#full_response = chat_client.chat.completions.create(
@@ -269,8 +274,17 @@ Return only SQL, no explanations or code fences.
 	#	]
 	#).choices[0].message.content
 
-
-
+	#	The "new" way using Responses instead of ChatCompletions
+	full_response = client.responses.create(
+		model = "gpt-4.1",
+		#input="You are an expert sqlite3 programmer.",
+		instructions = "You are a helpful assistant.",
+		input = prompt,
+		#input = [
+		#	{ "role": "system", "content": "You are a helpful assistant." },
+		#	{ "role": "user", "content": prompt }
+		#]
+	).output_text
 
 	#	The SQL is "pretty" because it SOMETIMES includes ```sql
 	print(full_response)
