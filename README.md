@@ -4,6 +4,20 @@ Documenting my AI learning ...
 
 
 
+
+
+##	20251013
+
+Meddling with langchain csv files
+
+Pandasai
+
+
+##	20251012
+
+Meddling with vector stores
+
+
 ##	20251006
 
 New ChatGPT's version works pretty good. 

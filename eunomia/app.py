@@ -6,7 +6,7 @@ import os
 #from pprint import pformat
 
 from app_utils import load_dotenv
-from chatlas import ChatOpenAI
+#from chatlas import ChatOpenAI
 
 from shiny.express import ui
 
@@ -20,15 +20,29 @@ _ = load_dotenv()
 # This dbenv only needs an OPENAI_API_KEY
 # No LANGCHAIN_API_KEY is needed as langchain has been removed
 
-from openai import OpenAI
-#client = OpenAI()
-
-from openai import AzureOpenAI
-#client = AzureOpenAI(
-#	api_key=os.environ.get('API_KEY'),
-#	api_version=os.environ.get('API_VERSION'),
-#	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
+#	OpenAI
+# ChatOpenAI() requires an API key from OpenAI.
+# See the docs for more information on how to obtain one.
+# https://posit-dev.github.io/chatlas/reference/ChatOpenAI.html
+#chat_client = ChatOpenAI(
+#    api_key=os.environ.get("OPENAI_API_KEY"),
+#    model="gpt-4o",
+#    #model="gpt-4o-mini",	#	try this next time as it may be cheaper.
+#    system_prompt="You are a helpful assistant.",
 #)
+
+
+##from openai import OpenAI
+##client = OpenAI()
+#	Versa API
+from openai import AzureOpenAI
+chat_client = AzureOpenAI(
+	api_key=os.environ.get('API_KEY'),
+	api_version=os.environ.get('API_VERSION'),
+	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
+)
+
+
 
 DB_PATH = "eunomia.sqlite"
 conn = sqlite3.connect(DB_PATH)
@@ -60,21 +74,19 @@ def clean_sql(sql: str) -> str:
 
 
 # ---------- GPT helpers ----------
-def generate_sql(question: str, schema: str) -> str:
-    prompt = f"""
-Database schema:
-
-{schema}
-
-Write a valid SQLite SQL query that answers:
-{question}
-
-Return SQL inside code fences
-"""
-		#Return only SQL, no explanations or code fences.
-    sql = chat(prompt, role="SQL expert")
-    return sql
-    #return clean_sql(sql)
+#def generate_sql(question: str, schema: str) -> str:
+#    prompt = f"""
+#Database schema:
+#
+#{schema}
+#
+#Write a valid SQLite SQL query that answers:
+#{question}
+#
+#Return only SQL, no explanations or code fences.
+#"""
+#    sql = chat(prompt, role="SQL expert")
+#    return clean_sql(sql)
 
 
 #	def explain_results(question: str, sql: str, rows: list) -> str:
@@ -175,27 +187,6 @@ Return SQL inside code fences
 
 
 
-# ChatOpenAI() requires an API key from OpenAI.
-# See the docs for more information on how to obtain one.
-# https://posit-dev.github.io/chatlas/reference/ChatOpenAI.html
-#load_dotenv()
-chat_client = ChatOpenAI(
-#client = AzureOpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
-		#api_key=os.environ.get('API_KEY'),
-		#api_version=os.environ.get('API_VERSION'),
-		#azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
-		#)
-		#
-		##ChatCompletion
-		##response = openai.ChatCompletion.create(
-		#chat_client = client.chat.completions.create(
-    model="gpt-4o",
-		#model = 'gpt-4o-mini-2024-07-18',
-    #model="gpt-4o-mini",	#	try this next time as it may be cheaper. The output sql isn't printed pretty for some reason
-    system_prompt="You are a helpful assistant.",
-    #messages=[{"role": "system", "content": "You are a helpful assistant."}],
-)
 #messages=[
 #	# The system content below shapes the behavior of the model. For instance, you could instruct the model to only answer in French.
 #	{"role": "system", "content": 'You are a helpful AI assistant'}, 
@@ -229,6 +220,22 @@ async def handle_user_input(user_input: str):
 	#sql = generate_sql(question, schema)
 	#response = await chat_client.stream_async( user_input )
 
+#sqlite_prefix = '''You are an agent designed to interact with a SQLite database.
+#Given an input question, create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
+#Always limit your query to at most {top_k} results.
+#You can order the results by a relevant column to return the most interesting examples in the database.
+#Only query for all the columns from a specific table if asked--otherwise, only ask for the relevant columns given the question.
+#You have access to tools for interacting with the database. 
+#
+#If you get an error while executing a query, rewrite the query and try again.
+#DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
+#If the question does not seem related to the database, just return "I don\'t know" as the answer.
+#Do not surround the sql query with quotes.
+#The data is standardized to OMOP 5.3.
+#All table names should be converted to upper case in this database
+#Do NOT quote table names when passing as action input
+
+
 	prompt = f"""
 Database schema:
 
@@ -239,19 +246,35 @@ Write a valid SQLite SQL query that answers:
 
 Return only SQL, no explanations or code fences.
 """
-	response = await chat_client.stream_async( prompt )
 
-	full_response=""
-	async for text_chunk in response:
-		full_response += text_chunk
+
+	#	OpenAI
+	#response = await chat_client.stream_async( prompt )
+	#full_response=""
+	#async for text_chunk in response:
+	#	full_response += text_chunk
+	
+	#	Versa API
+	full_response = chat_client.chat.completions.create(
+		#model = 'gpt-4o-mini-2024-07-18',
+		model = 'gpt-5-mini-2025-08-07',
+		messages=[
+			{"role": "system", "content": "You are an expert sqlite3 programmer."},
+			{"role": "user", "content": prompt }
+		]
+	).choices[0].message.content
+
+
+
 
 	#	The SQL is "pretty" because it SOMETIMES includes ```sql
 	print(full_response)
 	full_response=clean_sql(full_response)
 	await chat.append_message_stream("```sql\n"+full_response+"\n```")
-
+	print(full_response)
 	cursor.execute(full_response)
 	rows = cursor.fetchall()
+	print(str(rows))
 
 	#await chat.append_message_stream(pformat(rows))
 	#await chat.append_message_stream("```"+str(rows)+"```")
@@ -288,6 +311,10 @@ Return only SQL, no explanations or code fences.
 #	Not sure what purpose "-n eunomia" serves but apparently something is required
 #		-n, --name TEXT                 The nickname of the Posit Connect server to deploy to.
 #	rsconnect deploy shiny -n eunomia .
+
+
+#			What is the number of males and females that are prescribed the top 10 prescribed drugs
+
 
 
 
