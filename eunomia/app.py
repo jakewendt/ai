@@ -285,6 +285,7 @@ Return only SQL, no explanations or code fences.
 		#	{ "role": "system", "content": "You are a helpful assistant." },
 		#	{ "role": "user", "content": prompt }
 		#]
+		temperature=0,	#	0-2, default is 1.
 	).output_text
 
 	#	The SQL is "pretty" because it SOMETIMES includes ```sql
@@ -299,8 +300,7 @@ Return only SQL, no explanations or code fences.
 	#await chat.append_message_stream(pformat(rows))
 	#await chat.append_message_stream("```"+str(rows)+"```")
 	#await chat.append_message_stream(str(rows.to_markdown(index=False)))
-	#await chat.append_message_stream(str(pd.DataFrame(rows).to_markdown(index=False)))
-	await chat.append_message_stream(str(pd.DataFrame(rows).to_markdown()))
+	await chat.append_message_stream(str(pd.DataFrame(rows).to_markdown(index=False)))
 
 
 
