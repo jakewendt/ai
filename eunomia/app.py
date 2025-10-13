@@ -6,7 +6,6 @@ import os
 #from pprint import pformat
 
 from app_utils import load_dotenv
-#from chatlas import ChatOpenAI
 
 from shiny.express import ui
 
@@ -24,23 +23,26 @@ _ = load_dotenv()
 # ChatOpenAI() requires an API key from OpenAI.
 # See the docs for more information on how to obtain one.
 # https://posit-dev.github.io/chatlas/reference/ChatOpenAI.html
-#chat_client = ChatOpenAI(
-#    api_key=os.environ.get("OPENAI_API_KEY"),
-#    model="gpt-4o",
-#    #model="gpt-4o-mini",	#	try this next time as it may be cheaper.
-#    system_prompt="You are a helpful assistant.",
-#)
+from chatlas import ChatOpenAI
+chat_client = ChatOpenAI(
+	api_key=os.environ.get("OPENAI_API_KEY"),
+	model="gpt-4o",
+	#model="gpt-4o-mini",	#	just not as good
+	#system_prompt="You are a helpful assistant.",
+	system_prompt="You are an expert sqlite3 programmer.",
+)
 
 
 ##from openai import OpenAI
 ##client = OpenAI()
+
 #	Versa API
-from openai import AzureOpenAI
-chat_client = AzureOpenAI(
-	api_key=os.environ.get('API_KEY'),
-	api_version=os.environ.get('API_VERSION'),
-	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
-)
+#from openai import AzureOpenAI
+#chat_client = AzureOpenAI(
+#	api_key=os.environ.get('API_KEY'),
+#	api_version=os.environ.get('API_VERSION'),
+#	azure_endpoint=os.environ.get('RESOURCE_ENDPOINT'),
+#)
 
 
 
@@ -241,7 +243,8 @@ Database schema:
 
 {schema}
 
-Write a valid SQLite SQL query that answers:
+Write a valid SQLite SQL query that correctly answers:
+
 {user_input}
 
 Return only SQL, no explanations or code fences.
@@ -249,20 +252,20 @@ Return only SQL, no explanations or code fences.
 
 
 	#	OpenAI
-	#response = await chat_client.stream_async( prompt )
-	#full_response=""
-	#async for text_chunk in response:
-	#	full_response += text_chunk
+	response = await chat_client.stream_async( prompt )
+	full_response=""
+	async for text_chunk in response:
+		full_response += text_chunk
 	
 	#	Versa API
-	full_response = chat_client.chat.completions.create(
-		#model = 'gpt-4o-mini-2024-07-18',
-		model = 'gpt-5-mini-2025-08-07',
-		messages=[
-			{"role": "system", "content": "You are an expert sqlite3 programmer."},
-			{"role": "user", "content": prompt }
-		]
-	).choices[0].message.content
+	#full_response = chat_client.chat.completions.create(
+	#	#model = 'gpt-4o-mini-2024-07-18',
+	#	model = 'gpt-5-mini-2025-08-07',
+	#	messages=[
+	#		{"role": "system", "content": "You are an expert sqlite3 programmer."},
+	#		{"role": "user", "content": prompt }
+	#	]
+	#).choices[0].message.content
 
 
 
@@ -271,10 +274,10 @@ Return only SQL, no explanations or code fences.
 	print(full_response)
 	full_response=clean_sql(full_response)
 	await chat.append_message_stream("```sql\n"+full_response+"\n```")
-	print(full_response)
+	#print(full_response)
 	cursor.execute(full_response)
 	rows = cursor.fetchall()
-	print(str(rows))
+	#print(str(rows))
 
 	#await chat.append_message_stream(pformat(rows))
 	#await chat.append_message_stream("```"+str(rows)+"```")

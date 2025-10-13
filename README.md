@@ -12,6 +12,9 @@ Meddling with langchain csv files
 
 Pandasai
 
+Working with Versa API.
+Will only work within the confines of UCSF or its VPN.
+
 
 ##	20251012
 
