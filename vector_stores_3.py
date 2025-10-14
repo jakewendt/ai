@@ -18,11 +18,17 @@ def format_results(results):
         formatted_results += formatted_result + "</result>"
     return f"<sources>{formatted_results}</sources>"
 
-for vs in client.vector_stores.list():
-	print(vs)
-	client.vector_stores.delete( vector_store_id=vs.id)
+#for vs in client.vector_stores.list():
+#	print(vs)
+#	for f in client.vector_stores.files.list(vector_store_id=vs.id):
+#		print(f)
+#		#client.files.delete(f.id)
+#		client.vector_stores.files.delete( vector_store_id=vs.id, file_id=f.id )
+#	client.vector_stores.delete( vector_store_id=vs.id)
+
 
 #quit()
+
 
 vector_store = client.vector_stores.create(        # Create vector store
     name="Support FAQ",
@@ -62,6 +68,18 @@ results = client.vector_stores.search(
     query=user_query
 )
 print(results)
+
+
+## Iterate through the search results and extract content
+#for data in response.data:
+#    print(f"File ID: {data.file_id}, Filename: {data.filename}")
+#    print(f"Relevance Score: {data.score}")
+#    print(f"Attributes: {json.dumps(data.attributes, indent=2, ensure_ascii=False)}")
+#    # Extracting and printing the content snippet (first 100 characters in this example)
+#    print(f"Content Snippet: {''.join(content.text for content in data.content)[:100]}...")
+#    print("-" * 30)
+
+
 
 #	Can't send .data as the first thing it does is look for it.
 formatted_results = format_results(results)	#.data)
@@ -103,5 +121,16 @@ print()
 #	
 #	print(results.data[0].score)	#.content[0].text)
 #	#print(results[0].data)
+
+
+#	A File and a VectorStoreFile are not the same. I think that latter is a join object.
+#	Deleting a VectorStoreFile does not delete the File.
+#	Deleting a VectorStoreFile may be unnecessary.
+#vector_store = client.vector_stores.retrieve(vector_store_id=vector_store.id)
+for f in client.vector_stores.files.list(vector_store_id=vector_store.id):
+	print(f)
+	print(client.vector_stores.files.delete( vector_store_id=vector_store.id, file_id=f.id ))
+	print(client.files.delete(f.id))
+print(client.vector_stores.delete( vector_store_id=vector_store.id))
 
 
