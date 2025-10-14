@@ -15,6 +15,9 @@ Pandasai
 Working with Versa API.
 Will only work within the confines of UCSF or its VPN.
 
+More vector score testing with built in
+
+
 
 ##	20251012
 
