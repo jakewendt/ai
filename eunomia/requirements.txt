@@ -1,6 +1,5 @@
 shiny
 python-dotenv
-chatlas
 openai
 pandas
 tabulate

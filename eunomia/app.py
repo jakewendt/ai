@@ -305,6 +305,7 @@ Return only SQL, no explanations or code fences.
 
 
 
+#	shiny create ......
 
 #	- Install required dependencies:
 #	    cd eunomia
