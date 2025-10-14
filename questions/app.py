@@ -9,6 +9,9 @@ from shiny.express import ui
 
 import pandas as pd
 
+import openai
+from supabase import create_client, Client
+
 
 # ---------- Setup ----------
 _ = load_dotenv()
@@ -16,11 +19,18 @@ _ = load_dotenv()
 
 #	The "new" way using Responses instead of ChatCompletions
 #	https://platform.openai.com/docs/api-reference/responses
-from openai import OpenAI
-client = OpenAI()
+#from openai import OpenAI
+#client = OpenAI()
 
-#	vector_store = client.vector_stores.retrieve(vector_store_id=vector_store.id)
 
+# Initialize Supabase client
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+
+
+
+#vector_store = client.vector_stores.retrieve(vector_store_id="vs_68ee6b86db5c8191b7008830991e9657")
 
 
 # Set some Shiny page options
@@ -44,64 +54,37 @@ chat.ui(
 @chat.on_user_submit
 async def handle_user_input(user_input: str):
 	#
-	#	prompt = f"""
-	#Database schema:
+	#	results = client.vector_stores.search(
+	#		vector_store_id=vector_store.id,
+	#		query=user_input,
+	#		max_num_results=5,		# Defaults to 10
+	#		#ranking_options={
+	#		#	'ranker': 'auto',
+	#		#	'score_threshold': 0.7 # Exclude results with a score below 0.8 default is 0
+	#		#},
+	#	)
+	#	print(results)
+	#	print(results.data)
 	#
-	#{schema}
+	#	rows=[]
+	#	for result in results.data:
+	#		print(result.file_id)
+	#		print(result.filename)
+	#		print(result.score)
+	#		all_content=""
+	#		for content in result.content:
+	#			all_content += content.text
+	#		print(all_content)
+	#		rows.append([result.score,result.filename,all_content])
 	#
-	#Write a valid SQLite SQL query that correctly answers:
-	#
-	#{user_input}
-	#
-	#Always limit your query to at most 25 results.
-	#
-	#Return only SQL, no explanations or code fences.
-	#"""
-	#
-	#
-	#	#	The "new" way using Responses instead of ChatCompletions
-	#	full_response = client.responses.create(
-	#		model = "gpt-4.1",
-	#		instructions = "You are a helpful assistant.",
-	#		input = prompt,
-	#		temperature=0,	#	0-2, default is 1.
-	#	).output_text
-	#
-	#	#	The SQL is "pretty" because it SOMETIMES includes ```sql
-	#	print(full_response)
-	#	full_response=clean_sql(full_response)
-	#	await chat.append_message_stream("```sql\n"+full_response+"\n```")
-	#	cursor.execute(full_response)
-	#	rows = cursor.fetchall()
-	#await chat.append_message_stream(str(pd.DataFrame(rows).to_markdown(index=False)))
+	#	await chat.append_message_stream(str(pd.DataFrame(rows).to_markdown(index=False)))
 
-	response = await chat_client.stream_async(user_input)
-	await chat.append_message_stream(response)
+	embedding = openai.embeddings.create(input=user_input, model="text-embedding-3-small", encoding_format="float")
+	
+	response = supabase.rpc("query_questions", {"query_embedding": embedding.data[0].embedding}).execute()
+	#print(response.data)
 
-#user_query="What is the return policy?"
-#results = client.vector_stores.search(
-#    vector_store_id=vector_store.id,
-#    query=user_query
-#max_num_results integer Optional Defaults to 10
-#    ranking_options={
-#        'ranker': 'auto',
-#        'score_threshold': 0.7 # Exclude results with a score below 0.8 default is 0
-#    },
-#)
-#print(results)
-#completion = client.chat.completions.create(
-#    model="gpt-4.1",
-#    messages=[
-#        { "role": "developer",
-#            "content": "Produce a concise answer to the query based on the provided sources."
-#        },
-#        { "role": "user",
-#            "content": f"Sources: {formatted_results}\n\nQuery: '{user_query}'"
-#        }
-#    ],
-#)
-#print(completion.choices[0].message.content)
-
+	await chat.append_message_stream(str(pd.DataFrame(response.data).to_markdown(index=False)))
 
 
 
@@ -110,9 +93,9 @@ async def handle_user_input(user_input: str):
 #	shiny create ......
 
 #	- Install required dependencies:
-#	    cd eunomia
+#	    cd questions
 #	    pip install -r requirements.txt
-#	- Open and edit the app file: eunomia/app.py
+#	- Open and edit the app file: questions/app.py
 #	- Put your OpenAI API key in the `template.env` file and rename it to `.env`.
 #	- Run the app with `shiny run app.py`.
 #	
