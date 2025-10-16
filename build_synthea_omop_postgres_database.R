@@ -22,6 +22,7 @@ library(ETLSyntheaBuilder)
 
 
 #	#	Download the data. This includes json, xml and csv. Just using the csv here.
+#	#	https://synthea.mitre.org/downloads
 #	#	SyntheticMass Data, Version 2 (24 May, 2017): 21GB. FHIR 3.0.1, CSV, C-CDA
 #	#	https://mitre.box.com/shared/static/3bo45m48ocpzp8fc0tp005vax7l93xji.gz
 #
