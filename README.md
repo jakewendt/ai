@@ -3,6 +3,9 @@
 Documenting my AI learning ...
 
 
+##	20251024
+
+Dev'd 2 new notebooks
 
 
 
