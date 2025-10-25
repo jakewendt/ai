@@ -21,7 +21,7 @@ for vs in client.vector_stores.list():
 
 #	Delete all files.
 #
-#	for f in client.files.list():
-#		print(f)
-#		client.files.delete(f.id)
+for f in client.files.list():
+	print(f)
+	client.files.delete(f.id)
 
