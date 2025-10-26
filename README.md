@@ -3,10 +3,19 @@
 Documenting my AI learning ...
 
 
+
+
+
+##	20251026
+
+Updated these last 2 openai demos and add a temperature of 0.
+
+Also figured out how to download an image created in the container.
+
+
 ##	20251024
 
 Dev'd 2 new notebooks
-
 
 
 ##	20251013
@@ -19,7 +28,6 @@ Working with Versa API.
 Will only work within the confines of UCSF or its VPN.
 
 More vector score testing with built in
-
 
 
 ##	20251012
