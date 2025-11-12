@@ -1,2 +1,17 @@
+.env
 .dbenv
 .ipynb_checkpoints/
+manifest.csv
+manifest_final.csv
+mini_data.csv
+mini_manifest.csv
+Counts.csv
+Counts.normalized.subtracted.csv
+data.csv
+iris.csv
+normalized_data_final.csv
+normalized_data_plate_corrected.csv
+normalized_data_zscored_unmerged.csv
+gitignore/
+MYTOKEN
+MYSECRET
